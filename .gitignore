@@ -1,0 +1,78 @@
+# ========================
+# APLIKASI WEB PHP - .gitignore
+# ========================
+
+# ============
+# Konfigurasi & Environment
+# ============
+.env
+.env.local
+.env.*.local
+config/database.php  # hapus baris ini jika tidak ada file ini
+*.ini
+
+# ============
+# Composer (Dependency Manager PHP)
+# ============
+/vendor/
+composer.phar
+composer.lock
+
+# ============
+# Upload & File Pengguna
+# ============
+/uploads/
+/storage/
+/public/uploads/
+
+# ============
+# Cache & Log
+# ============
+*.log
+/cache/
+/tmp/
+/temp/
+
+# ============
+# File Backup & Temporary
+# ============
+*.bak
+*.tmp
+*.orig
+
+# ============
+# Database Export (jangan commit dump DB!)
+# ============
+*.sql
+*.sqlite
+*.db
+
+# ============
+# IDE & Editor
+# ============
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.sublime-workspace
+.history/
+
+# ============
+# OS System Files
+# ============
+.DS_Store          # macOS
+Thumbs.db          # Windows
+Desktop.ini
+*~
+
+# ============
+# Node Modules (jika pakai npm/vite untuk asset)
+# ============
+/node_modules/
+npm-debug.log*
+package-lock.json
+
+# ============
+# SASS/CSS Compiled
+# ============
+.sass-cache/
+*.css.map
