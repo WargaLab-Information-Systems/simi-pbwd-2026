@@ -43,9 +43,9 @@ composer.lock
 # ============
 # Database Export (jangan commit dump DB!)
 # ============
-# *.sql
-# *.sqlite
-# *.db
+*.sql
+*.sqlite
+*.db
 
 # ============
 # IDE & Editor
