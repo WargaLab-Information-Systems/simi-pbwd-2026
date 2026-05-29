@@ -109,3 +109,4 @@ $ads_query = mysqli_query($conn, "SELECT advertisements.id, advertisements.title
     </script>
 </body>
 </html>
+//yang baru
