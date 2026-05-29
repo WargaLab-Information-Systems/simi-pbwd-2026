@@ -68,7 +68,7 @@ if (isset($_GET['edit'])) {
     $res_edit = mysqli_query($conn, $query_edit);
     $editData = mysqli_fetch_assoc($res_edit);
 }
-
+// omegattttt
 // membaca data
 $query_all = "SELECT * FROM clients ORDER BY id DESC";
 $result_all = mysqli_query($conn, $query_all);
