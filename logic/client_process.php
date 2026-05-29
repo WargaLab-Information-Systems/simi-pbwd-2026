@@ -1,6 +1,8 @@
 <?php
-include __DIR__ . "/../helper/db_conn.php";
 
+session_start();
+require_once '../helper/db_conn.php';
+require_once '../helper/data/client.php';
 
 // tambah
 if (isset($_POST['action']) && $_POST['action'] == 'insert') {
@@ -59,4 +61,13 @@ if (isset($_GET['delete'])) {
     }
 }
 // echo "masyaallah";
+
+$action = $_POST['action'] ?? '';
+
+if ($action === 'insert') {
+    if (insertClient($conn, $_POST['name'], $_POST['phone'], $_POST['address'])) {
+        header("Location: ../pages/clients/index.php");
+        exit;
+    }
+}
 ?>
