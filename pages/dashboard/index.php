@@ -44,7 +44,7 @@ $count_selesai = getAdvertisementCountByStatus($conn, 'selesai');
                 <p class="text-xl font-bold text-slate-900">Rp <?php echo number_format($total_revenue, 0, ',', '.'); ?></p>
             </div>
             <div class="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm">
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Iklan Iklan Aktif</p>
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Iklan Aktif</p>
                 <p class="text-2xl font-bold text-emerald-600"><?php echo $count_aktif; ?></p>
             </div>
             <div class="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm">
