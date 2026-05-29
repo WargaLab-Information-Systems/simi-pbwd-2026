@@ -1,6 +1,6 @@
 <?php
 
-include __DIR__ . "/../../helper/db_conn.php";
+ include __DIR__ . "/../../helper/db_conn.php";
 
 // tambah
 if (isset($_POST['action']) && $_POST['action'] == 'insert') {
