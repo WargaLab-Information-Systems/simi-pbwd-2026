@@ -1,10 +1,8 @@
 <?php
-// Naik satu tingkat ke helper/db_conn.php
 include __DIR__ . "/../db_conn.php";
 
 if (!function_exists('getAllPayments')) {
     
-    // [KODE: read all data payment (php)]
     function getAllPayments($conn, $search = "") {
         $search = mysqli_real_escape_string($conn, $search);
         
@@ -23,7 +21,6 @@ if (!function_exists('getAllPayments')) {
         return mysqli_query($conn, $query);
     }
 
-    // [KODE: read data payment by id (php)]
     function getPaymentById($conn, $id) {
         $id = mysqli_real_escape_string($conn, $id);
         $query = "SELECT * FROM payments WHERE id = '$id'";
@@ -31,7 +28,6 @@ if (!function_exists('getAllPayments')) {
         return mysqli_fetch_assoc($result);
     }
 
-    // Ringkasan Statistik
     function getPaymentStats($conn) {
         $income = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(amount) AS total FROM payments WHERE payment_status = 'lunas'"))['total'] ?? 0;
         $success = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) AS total FROM payments WHERE payment_status = 'lunas'"))['total'] ?? 0;
@@ -44,7 +40,7 @@ if (!function_exists('getAllPayments')) {
         ];
     }
 
-    // Pembuat ID Invoice Otomatis
+    // membuat ID Invoice Otomatis
     function generateInvoiceId($conn, $editData = null) {
         if ($editData) {
             return "#SIMI-" . str_pad($editData['id'], 3, '0', STR_PAD_LEFT);
@@ -54,7 +50,6 @@ if (!function_exists('getAllPayments')) {
         return "#SIMI-" . str_pad($next_id, 3, '0', STR_PAD_LEFT);
     }
 
-    // Flash Message Notifikasi
     function getPaymentMessage() {
         if (!isset($_GET['msg'])) return null;
         

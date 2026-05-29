@@ -1,7 +1,5 @@
 <?php
 include __DIR__ . "/../../helper/db_conn.php";
-
-// 2. Baru panggil helper data payment
 include __DIR__ . "/../../helper/data/payment.php";
 
 $editData = (isset($_GET['edit'])) ? getPaymentById($conn, $_GET['edit']) : null;
@@ -86,7 +84,6 @@ $ads_query = mysqli_query($conn, "SELECT advertisements.id, advertisements.title
             const ad = document.getElementById('advertisement_id');
             const amount = document.getElementById('amount');
             
-            // Validasi Dropdown Iklan
             if(ad.value === "") {
                 document.getElementById('error_ad').classList.remove('hidden');
                 ad.classList.add('border-red-500');
@@ -96,7 +93,6 @@ $ads_query = mysqli_query($conn, "SELECT advertisements.id, advertisements.title
                 ad.classList.remove('border-red-500');
             }
 
-            // Validasi Nominal Angka
             if(amount.value.trim() === "" || parseInt(amount.value) <= 0) {
                 document.getElementById('error_amount').classList.remove('hidden');
                 amount.classList.add('border-red-500');
@@ -106,7 +102,6 @@ $ads_query = mysqli_query($conn, "SELECT advertisements.id, advertisements.title
                 amount.classList.remove('border-red-500');
             }
 
-            // Jika ada yang tidak valid, batalkan pengiriman form ke PHP
             if(!isValid) {
                 e.preventDefault();
             }

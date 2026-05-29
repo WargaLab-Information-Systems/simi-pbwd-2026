@@ -101,15 +101,12 @@ $sysMessage  = getPaymentMessage();
     </div>
 
     <script>
-    // Cek apakah elemen notifikasi ada di halaman
     const alertBox = document.getElementById('notification-box');
     if (alertBox) {
-        // Set waktu 3000 milidetik (3 detik) untuk menghilangkan notifikasi
         setTimeout(() => {
             alertBox.style.opacity = '0';
             alertBox.style.transform = 'translateY(-10px)';
 
-            // Benar-benar menghapus elemen dari layout setelah efek transisi selesai
             setTimeout(() => {
                 alertBox.remove();
             }, 500);
