@@ -28,7 +28,6 @@ $ads_query = mysqli_query($conn, "SELECT advertisements.id, advertisements.title
                 else echo 'Catat Transaksi Baru';
             ?>
         </h2>
-        <p class="text-gray-400 mb-6 text-xs">Pastikan informasi invoice dan nominal diisi dengan valid.</p>
 
         <form id="paymentForm" action="../../logic/payment_process.php" method="POST" class="space-y-4">
             <input type="hidden" name="action" value="<?= ($editData && !$is_pelunasan) ? 'update' : 'insert' ?>">
@@ -37,7 +36,7 @@ $ads_query = mysqli_query($conn, "SELECT advertisements.id, advertisements.title
             <?php endif; ?>
 
             <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">ID Invoice</label>
+                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">ID Transaksi</label>
                 <input type="text" readonly value="<?= $invoice_id ?>" class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-mono text-gray-500 cursor-not-allowed">
             </div>
 
