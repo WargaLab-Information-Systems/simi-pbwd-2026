@@ -1,10 +1,10 @@
 <?php
 session_start();
 // user dah login ?
-if (!isset($_SESSION['user_id'])) {
+if (isset($_SESSION['user_id'])) {
     // paksa ke login klo belum
-    header("Location: ../auth/login.php");
-    exit; 
+    header("Location: ../dashboard/index.php");
+    exit;
 }
 
 require_once '../../helper/db_conn.php';
