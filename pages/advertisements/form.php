@@ -8,14 +8,15 @@ require_once '../../helper/data/client.php';
 $id = $_GET['id'] ?? '';
 $ad = !empty($id) ? getAdvertisementById($conn, $id) : null;
 $clients = getAllClients($conn);
+$hari_ini = date('Y-m-d');
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Iklan</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Form Iklan - SIMI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 flex">
     <div class="w-64 bg-white border-r border-slate-100 p-6 h-screen sticky top-0 flex flex-col justify-between">
@@ -38,7 +39,7 @@ $clients = getAllClients($conn);
             <form id="adForm" method="POST" action="../../logic/advertisement_process.php" onsubmit="return validateAd(event)">
                 <input type="hidden" name="action" value="<?php echo $ad ? 'update' : 'insert'; ?>">
                 <?php if ($ad): ?><input type="hidden" name="id" value="<?php echo $ad['id']; ?>"><?php endif; ?>
-                
+
                 <div class="mb-4">
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Pilih Klien</label>
                     <select name="client_id" id="clientId" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
@@ -76,6 +77,7 @@ $clients = getAllClients($conn);
                     </div>
                 </div>
 
+                <!-- status dan harga -->
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Status</label>
@@ -87,7 +89,8 @@ $clients = getAllClients($conn);
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Nilai Kontrak (Rp)</label>
-                        <input type="number" id="adPrice" name="price" value="<?php echo $ad ? $ad['price'] : ''; ?>" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                        <input type="text" id="adPriceDisplay" value="<?php echo $ad ? number_format($ad['price'], 0, '', '.') : ''; ?>" oninput="formatCurrency(this)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500" >
+                        <input type="hidden" id="adPrice" name="price" value="<?php echo $ad ? $ad['price'] : ''; ?>">
                         <p id="price_error" class="text-xs text-red-500 mt-1 hidden"></p>
                     </div>
                 </div>
@@ -100,6 +103,26 @@ $clients = getAllClients($conn);
         </div>
     </div>
     <script>
+    document.getElementById('startDate').addEventListener('change', function() {
+        const endDateInput = document.getElementById('endDate');
+        if (this.value) {
+            let start = new Date(this.value);
+            start.setDate(start.getDate() + 1);
+            let nextDay = start.toISOString().split('T')[0];
+            endDateInput.min = nextDay;
+            
+            if (endDateInput.value && endDateInput.value <= this.value) {
+                endDateInput.value = '';
+            }
+        }
+    });
+
+    function formatCurrency(input) {
+        let value = input.value.replace(/[^0-9]/g, '');
+        document.getElementById('adPrice').value = value;
+        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
     function validateAd(event) {
         let isValid = true;
         const client = document.getElementById('clientId');
@@ -127,11 +150,22 @@ $clients = getAllClients($conn);
             document.getElementById('start_error').classList.remove('hidden');
             isValid = false;
         }
+        
         if (endDate.value === '') {
             document.getElementById('end_error').textContent = 'Tanggal selesai wajib diisi.';
             document.getElementById('end_error').classList.remove('hidden');
             isValid = false;
+        } else if (startDate.value !== '') {
+            const startD = new Date(startDate.value);
+            const endD = new Date(endDate.value);
+            
+            if (endD <= startD) {
+                document.getElementById('end_error').textContent = 'Tanggal selesai harus setelah tanggal mulai (minimal beda 1 hari).';
+                document.getElementById('end_error').classList.remove('hidden');
+                isValid = false;
+            }
         }
+
         if (price.value.trim() === '' || parseFloat(price.value) <= 0) {
             document.getElementById('price_error').textContent = 'Harga harus lebih dari 0.';
             document.getElementById('price_error').classList.remove('hidden');
