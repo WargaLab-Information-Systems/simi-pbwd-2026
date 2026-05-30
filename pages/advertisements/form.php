@@ -1,5 +1,12 @@
 <?php
 session_start();
+// user dah login ?
+if (!isset($_SESSION['user_id'])) {
+    // paksa ke login klo belum
+    header("Location: ../auth/login.php");
+    exit; 
+}
+
 if (!isset($_SESSION['user_id'])) { header("Location: ../auth/login.php"); exit; }
 require_once '../../helper/db_conn.php';
 require_once '../../helper/data/advertisement.php';
@@ -29,6 +36,8 @@ $hari_ini = date('Y-m-d');
                 <a href="../dashboard/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Dashboard</a>
                 <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium">Iklan</a>
                 <a href="../clients/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Klien</a>
+                <!-- ini buat payment -->
+                <a href="../payments/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Payment</a>
             </div>
         </div>
         <a href="../auth/logout.php" class="block px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium">Keluar</a>
