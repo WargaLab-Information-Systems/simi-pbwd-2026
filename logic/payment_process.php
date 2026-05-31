@@ -39,7 +39,7 @@ if (isset($_POST['action'])) {
         
         $status = mysqli_query($conn, $query) ? 'insert_success' : 'error';
         
-    // edit
+    // update
     } elseif ($action == 'update') {
         $id = mysqli_real_escape_string($conn, $_POST['id']);
         $query = "UPDATE payments SET 

@@ -49,6 +49,7 @@ if (!function_exists('getAllPayments')) {
         ];
     }
 
+    // membuat ID Invoice Otomatis
     function generateInvoiceId($conn, $editData = null) {
         if ($editData) {
             return "#SIMI-" . str_pad($editData['id'], 3, '0', STR_PAD_LEFT);
@@ -71,3 +72,11 @@ if (!function_exists('getAllPayments')) {
         return $messages[$_GET['msg']] ?? null;
     }
 }
+//yang baru
+function getTotalRevenue($conn) {
+    $query = "SELECT SUM(amount) as total FROM payments WHERE payment_status = 'lunas'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'] ?? 0;
+}
+?>
