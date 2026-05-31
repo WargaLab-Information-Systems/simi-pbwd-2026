@@ -22,8 +22,8 @@ $hari_ini = date('Y-m-d');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Iklan - SIMI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Form Iklan</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 flex">
     <div class="w-64 bg-white border-r border-slate-100 p-6 h-screen sticky top-0 flex flex-col justify-between">
@@ -159,7 +159,7 @@ $hari_ini = date('Y-m-d');
             document.getElementById('start_error').classList.remove('hidden');
             isValid = false;
         }
-        
+
         if (endDate.value === '') {
             document.getElementById('end_error').textContent = 'Tanggal selesai wajib diisi.';
             document.getElementById('end_error').classList.remove('hidden');
