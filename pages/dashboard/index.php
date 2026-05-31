@@ -1,5 +1,12 @@
 <?php
 session_start();
+// user dah login ?
+if (!isset($_SESSION['user_id'])) {
+    // paksa ke login klo belum
+    header("Location: ../auth/login.php");
+    exit; 
+}
+
 if (!isset($_SESSION['user_id'])) { 
     header("Location: ../auth/login.php"); 
     exit; 
@@ -32,6 +39,8 @@ $count_selesai = getAdvertisementCountByStatus($conn, 'selesai');
                 <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium">Dashboard</a>
                 <a href="../advertisements/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Iklan</a>
                 <a href="../clients/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Klien</a>
+                <!-- ini buat payment -->
+                <a href="../payments/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Payment</a>
             </div>
         </div>
         <a href="../auth/logout.php" class="block px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium">Keluar</a>
@@ -44,7 +53,7 @@ $count_selesai = getAdvertisementCountByStatus($conn, 'selesai');
                 <p class="text-xl font-bold text-slate-900">Rp <?php echo number_format($total_revenue, 0, ',', '.'); ?></p>
             </div>
             <div class="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm">
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Iklan Iklan Aktif</p>
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Iklan Aktif</p>
                 <p class="text-2xl font-bold text-emerald-600"><?php echo $count_aktif; ?></p>
             </div>
             <div class="bg-white border border-slate-100 p-6 rounded-2xl shadow-sm">

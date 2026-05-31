@@ -1,5 +1,12 @@
 <?php
 session_start();
+// user dah login ?
+if (isset($_SESSION['user_id'])) {
+    // paksa ke login klo belum
+    header("Location: ../dashboard/index.php");
+    exit;
+}
+
 require_once '../../helper/db_conn.php';
 $error_message = '';
 
@@ -31,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login SIMI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body class="bg-slate-50 flex items-center justify-center min-h-screen">
     <div class="w-full max-w-md bg-white border border-slate-100 p-8 rounded-2xl shadow-sm">

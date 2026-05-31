@@ -1,5 +1,12 @@
 <?php
 session_start();
+// user dah login ?
+if (!isset($_SESSION['user_id'])) {
+    // paksa ke login klo belum
+    header("Location: ../auth/login.php");
+    exit; 
+}
+
 if (!isset($_SESSION['user_id'])) { header("Location: ../auth/login.php"); exit; }
 require_once '../../helper/db_conn.php';
 require_once '../../helper/data/advertisement.php';
@@ -8,6 +15,7 @@ require_once '../../helper/data/client.php';
 $id = $_GET['id'] ?? '';
 $ad = !empty($id) ? getAdvertisementById($conn, $id) : null;
 $clients = getAllClients($conn);
+$hari_ini = date('Y-m-d');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +36,8 @@ $clients = getAllClients($conn);
                 <a href="../dashboard/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Dashboard</a>
                 <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium">Iklan</a>
                 <a href="../clients/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Klien</a>
+                <!-- ini buat payment -->
+                <a href="../payments/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Payment</a>
             </div>
         </div>
         <a href="../auth/logout.php" class="block px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl text-sm font-medium">Keluar</a>
@@ -38,7 +48,7 @@ $clients = getAllClients($conn);
             <form id="adForm" method="POST" action="../../logic/advertisement_process.php" onsubmit="return validateAd(event)">
                 <input type="hidden" name="action" value="<?php echo $ad ? 'update' : 'insert'; ?>">
                 <?php if ($ad): ?><input type="hidden" name="id" value="<?php echo $ad['id']; ?>"><?php endif; ?>
-                
+
                 <div class="mb-4">
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Pilih Klien</label>
                     <select name="client_id" id="clientId" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
@@ -76,6 +86,7 @@ $clients = getAllClients($conn);
                     </div>
                 </div>
 
+                <!-- status dan harga -->
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Status</label>
@@ -87,7 +98,8 @@ $clients = getAllClients($conn);
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Nilai Kontrak (Rp)</label>
-                        <input type="number" id="adPrice" name="price" value="<?php echo $ad ? $ad['price'] : ''; ?>" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
+                        <input type="text" id="adPriceDisplay" value="<?php echo $ad ? number_format($ad['price'], 0, '', '.') : ''; ?>" oninput="formatCurrency(this)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500" >
+                        <input type="hidden" id="adPrice" name="price" value="<?php echo $ad ? $ad['price'] : ''; ?>">
                         <p id="price_error" class="text-xs text-red-500 mt-1 hidden"></p>
                     </div>
                 </div>
@@ -100,6 +112,26 @@ $clients = getAllClients($conn);
         </div>
     </div>
     <script>
+    document.getElementById('startDate').addEventListener('change', function() {
+        const endDateInput = document.getElementById('endDate');
+        if (this.value) {
+            let start = new Date(this.value);
+            start.setDate(start.getDate() + 1);
+            let nextDay = start.toISOString().split('T')[0];
+            endDateInput.min = nextDay;
+            
+            if (endDateInput.value && endDateInput.value <= this.value) {
+                endDateInput.value = '';
+            }
+        }
+    });
+
+    function formatCurrency(input) {
+        let value = input.value.replace(/[^0-9]/g, '');
+        document.getElementById('adPrice').value = value;
+        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
     function validateAd(event) {
         let isValid = true;
         const client = document.getElementById('clientId');
@@ -127,11 +159,22 @@ $clients = getAllClients($conn);
             document.getElementById('start_error').classList.remove('hidden');
             isValid = false;
         }
+
         if (endDate.value === '') {
             document.getElementById('end_error').textContent = 'Tanggal selesai wajib diisi.';
             document.getElementById('end_error').classList.remove('hidden');
             isValid = false;
+        } else if (startDate.value !== '') {
+            const startD = new Date(startDate.value);
+            const endD = new Date(endDate.value);
+            
+            if (endD <= startD) {
+                document.getElementById('end_error').textContent = 'Tanggal selesai harus setelah tanggal mulai (minimal beda 1 hari).';
+                document.getElementById('end_error').classList.remove('hidden');
+                isValid = false;
+            }
         }
+
         if (price.value.trim() === '' || parseFloat(price.value) <= 0) {
             document.getElementById('price_error').textContent = 'Harga harus lebih dari 0.';
             document.getElementById('price_error').classList.remove('hidden');
