@@ -1,6 +1,12 @@
 <?php
-include __DIR__ . "/../../helper/db_conn.php";
-include __DIR__ . "/../../helper/data/payment.php";
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
+
+require_once __DIR__ . '/../../helper/db_conn.php';
+require_once __DIR__ . '/../../helper/data/payment.php';
 
 $editData = (isset($_GET['edit'])) ? getPaymentById($conn, $_GET['edit']) : null;
 $invoice_id = generateInvoiceId($conn, $editData);
@@ -109,4 +115,3 @@ $ads_query = mysqli_query($conn, "SELECT advertisements.id, advertisements.title
     </script>
 </body>
 </html>
-//yang baru
