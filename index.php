@@ -1,4 +1,4 @@
 <?php
 
-header("Location: ./pages/auth/login.php");
-exit();
+// header("Location: ./pages/auth/login.php");
+//exit();
