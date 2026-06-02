@@ -1,24 +1,18 @@
 <?php
 session_start();
-// user dah login ?
 if (!isset($_SESSION['user_id'])) {
-    // paksa ke login klo belum
     header("Location: ../auth/login.php");
-    exit; 
+    exit;
 }
 
-if (!isset($_SESSION['user_id'])) { 
-    header("Location: ../auth/login.php"); 
-    exit; 
-}
-require_once '../../helper/db_conn.php';
-require_once '../../helper/data/advertisement.php';
-require_once '../../helper/data/payment.php';
+require_once __DIR__ . '/../../helper/db_conn.php';
+require_once __DIR__ . '/../../helper/data/advertisement.php';
+require_once __DIR__ . '/../../helper/data/payment.php';
 
-$total_revenue = getTotalRevenue($conn);
-$count_aktif = getAdvertisementCountByStatus($conn, 'aktif');
+$total_revenue     = getTotalRevenue($conn);
+$count_aktif       = getAdvertisementCountByStatus($conn, 'aktif');
 $count_belum_tayang = getAdvertisementCountByStatus($conn, 'belum_tayang');
-$count_selesai = getAdvertisementCountByStatus($conn, 'selesai');
+$count_selesai     = getAdvertisementCountByStatus($conn, 'selesai');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -39,7 +33,6 @@ $count_selesai = getAdvertisementCountByStatus($conn, 'selesai');
                 <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium">Dashboard</a>
                 <a href="../advertisements/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Iklan</a>
                 <a href="../clients/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Klien</a>
-                <!-- ini buat payment -->
                 <a href="../payments/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Payment</a>
             </div>
         </div>

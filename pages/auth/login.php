@@ -1,13 +1,11 @@
 <?php
 session_start();
-// user dah login ?
 if (isset($_SESSION['user_id'])) {
-    // paksa ke login klo belum
     header("Location: ../dashboard/index.php");
     exit;
 }
 
-require_once '../../helper/db_conn.php';
+require_once __DIR__ . '/../../helper/db_conn.php';
 $error_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
