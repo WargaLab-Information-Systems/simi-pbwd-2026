@@ -1,13 +1,18 @@
 <?php
-include __DIR__ . "/../../helper/db_conn.php";
-include __DIR__ . "/../../helper/data/payment.php";
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
 
+require_once __DIR__ . '/../../helper/db_conn.php';
+require_once __DIR__ . '/../../helper/data/payment.php';
 
-$search = isset($_GET['search']) ? $_GET['search'] : '';
+$search      = isset($_GET['search']) ? $_GET['search'] : '';
 $result_all  = getAllPayments($conn, $search);
 $total_rows  = mysqli_num_rows($result_all);
 $stats       = getPaymentStats($conn);
-$sysMessage  = getPaymentMessage();
+$sys_message = getPaymentMessage();
 ?>
 
 <!DOCTYPE html>

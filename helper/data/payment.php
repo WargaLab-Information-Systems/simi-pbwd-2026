@@ -52,7 +52,7 @@ if (!function_exists('getAllPayments')) {
 
     function getPaymentMessage() {
         if (!isset($_GET['msg'])) return null;
-        
+
         $messages = [
             'insert_success' => ['text' => 'Data pembayaran berhasil ditambahkan!', 'type' => 'green'],
             'update_success' => ['text' => 'Data pembayaran berhasil diperbarui!', 'type' => 'blue'],
@@ -63,4 +63,10 @@ if (!function_exists('getAllPayments')) {
         return $messages[$_GET['msg']] ?? null;
     }
 }
-//yang baru
+
+function getTotalRevenue($conn) {
+    $query = "SELECT SUM(amount) as total FROM payments WHERE payment_status = 'lunas'";
+    $result = mysqli_query($conn, $query);
+    $row = mysqli_fetch_assoc($result);
+    return $row['total'] ?? 0;
+}
