@@ -14,6 +14,7 @@ $total_rows  = mysqli_num_rows($result_all);
 $stats       = getPaymentStats($conn);
 $sys_message = getPaymentMessage();
 ?>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -94,6 +95,7 @@ $sys_message = getPaymentMessage();
                                         <div class="font-semibold text-gray-900"><?= htmlspecialchars($row['client_name']) ?></div>
                                         <div class="text-xs text-gray-400 mt-0.5"><?= htmlspecialchars($row['ad_title']) ?></div>
                                     </td>
+
                                     <td class="p-4 text-right">
                                         <div class="font-bold text-gray-900">Rp <?= number_format($yang_dibayar, 0, ',', '.') ?></div>
                                         <?php if ($kurang_bayar > 0): ?>
@@ -102,6 +104,7 @@ $sys_message = getPaymentMessage();
                                             <div class="text-xs text-green-600 font-medium mt-0.5">Lunas (Pas)</div>
                                         <?php endif; ?>
                                     </td>
+
                                     <td class="p-4 text-center">
                                         <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold <?= $row['payment_status'] == 'lunas' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200' ?>">
                                             <?= $row['payment_status'] == 'lunas' ? 'Lunas' : 'Belum Lunas' ?>
