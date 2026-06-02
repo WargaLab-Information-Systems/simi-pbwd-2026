@@ -13,14 +13,14 @@ $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = mysqli_real_escape_string($conn, trim($_POST['email']));
     $plain_password = trim($_POST['password']);
-    
+
     if (strlen($plain_password) <= 6) {
         $error_message = "Password harus lebih dari 6 karakter.";
     } else {
         $password = md5($plain_password);
         $query = "SELECT id FROM users WHERE email = '$email' AND password = '$password' LIMIT 1";
         $result = mysqli_query($conn, $query);
-        
+
         if ($result && mysqli_num_rows($result) === 1) {
             $user_data = mysqli_fetch_assoc($result);
             $_SESSION['user_id'] = $user_data['id'];
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">S</div>
             <span class="font-bold text-xl text-slate-900">SIMI</span>
         </div>
-        
+
         <?php if ($error_message !== ''): ?>
             <div class="mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl text-center font-medium">
                 <?php echo $error_message; ?>
@@ -72,10 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         let isValid = true;
         const email = document.getElementById('email');
         const password = document.getElementById('password');
-        
+
         document.getElementById('email_error').classList.add('hidden');
         document.getElementById('password_error').classList.add('hidden');
-        
+
         if (email.value.trim() === '') {
             document.getElementById('email_error').textContent = 'Email wajib diisi.';
             document.getElementById('email_error').classList.remove('hidden');

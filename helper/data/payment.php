@@ -52,7 +52,7 @@ if (!function_exists('getAllPayments')) {
 
     function getPaymentMessage() {
         if (!isset($_GET['msg'])) return null;
-
+        
         $messages = [
             'insert_success' => ['text' => 'Data pembayaran berhasil ditambahkan!', 'type' => 'green'],
             'update_success' => ['text' => 'Data pembayaran berhasil diperbarui!', 'type' => 'blue'],
