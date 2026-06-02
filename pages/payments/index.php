@@ -1,11 +1,15 @@
 <?php
-// Menggunakan require_once untuk keamanan komponen inti backend
-require_once __DIR__ . "/../../helper/db_conn.php";
-require_once __DIR__ . "/../../helper/data/payment.php";
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../auth/login.php");
+    exit;
+}
 
-// Penamaan variabel menggunakan lowercase_underscore
+require_once __DIR__ . '/../../helper/db_conn.php';
+require_once __DIR__ . '/../../helper/data/payment.php';
+
 $search      = isset($_GET['search']) ? $_GET['search'] : '';
-$result_all  = getAllPayments($conn, $search); // Fungsi camelCase
+$result_all  = getAllPayments($conn, $search);
 $total_rows  = mysqli_num_rows($result_all);
 $stats       = getPaymentStats($conn);
 $sys_message = getPaymentMessage();
@@ -22,7 +26,7 @@ $sys_message = getPaymentMessage();
 <body class="text-gray-800 text-sm">
 
     <div class="flex min-h-screen bg-gray-50">
-        
+
         <div class="w-64 bg-white border-r border-slate-200 p-6 flex flex-col justify-between h-screen sticky top-0 shrink-0">
             <div>
                 <div class="flex items-center gap-2 mb-8">
@@ -33,19 +37,19 @@ $sys_message = getPaymentMessage();
                     <a href="../dashboard/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl font-medium transition-colors">Dashboard</a>
                     <a href="../advertisements/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl font-medium transition-colors">Iklan</a>
                     <a href="../clients/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl font-medium transition-colors">Klien</a>
-                    <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-semibold">Pembayaran</a>
+                    <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl font-semibold">Payment</a>
                 </div>
             </div>
             <a href="../auth/logout.php" class="block px-4 py-2.5 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-colors">Keluar</a>
         </div>
 
         <div class="flex-1 p-6 sm:p-10 overflow-x-hidden">
-            
+
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900">Riwayat Pembayaran</h1>
                 </div>
-                <a href="form.php" class="bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium hover:bg-blue-700 shadow-sm transition-colors text-center">
+                <a href="form.php" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-medium shadow-sm transition-colors text-center">
                     Pembayaran
                 </a>
             </div>
@@ -63,7 +67,7 @@ $sys_message = getPaymentMessage();
                         <button type="submit" class="bg-gray-200 hover:bg-gray-300 px-4 rounded-lg font-medium transition-colors">Cari</button>
                     </form>
                 </div>
-                
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left whitespace-nowrap">
                         <thead class="bg-gray-50 text-gray-500 uppercase text-xs font-bold border-b border-gray-200 tracking-wider">
@@ -79,20 +83,19 @@ $sys_message = getPaymentMessage();
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             <?php if ($total_rows > 0): $i = 1; while($row = mysqli_fetch_assoc($result_all)): ?>
-                                <?php 
+                                <?php
                                     $total_harga = floatval($row['total_price']);
-                                    // Mengubah ke 'total_paid' agar membaca hasil akumulasi seluruh cicilan
-                                    $yang_dibayar = floatval($row['total_paid']); 
+                                    $yang_dibayar = floatval($row['total_paid']);
                                     $kurang_bayar = $total_harga - $yang_dibayar;
                                 ?>
                                 <tr class="hover:bg-gray-50/70 transition-colors">
                                     <td class="p-4 text-gray-500"><?= $i++ ?></td>
-                                    <td class="p-4 font-mono font-medium text-gray-900">#SIMI-<?= str_pad($row['id'], 3, '0', STR_PAD_LEFT); ?></td>
+                                    <td class="p-4 font-mono font-medium text-gray-900">#PAY-<?= str_pad($row['id'], 3, '0', STR_PAD_LEFT); ?></td>
                                     <td class="p-4">
                                         <div class="font-semibold text-gray-900"><?= htmlspecialchars($row['client_name']) ?></div>
                                         <div class="text-xs text-gray-400 mt-0.5"><?= htmlspecialchars($row['ad_title']) ?></div>
                                     </td>
-                                    
+
                                     <td class="p-4 text-right">
                                         <div class="font-bold text-gray-900">Rp <?= number_format($yang_dibayar, 0, ',', '.') ?></div>
                                         <?php if ($kurang_bayar > 0): ?>
@@ -101,7 +104,7 @@ $sys_message = getPaymentMessage();
                                             <div class="text-xs text-green-600 font-medium mt-0.5">Lunas (Pas)</div>
                                         <?php endif; ?>
                                     </td>
-                                    
+
                                     <td class="p-4 text-center">
                                         <span class="inline-block px-2.5 py-1 rounded-full text-xs font-semibold <?= $row['payment_status'] == 'lunas' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-700 border border-amber-200' ?>">
                                             <?= $row['payment_status'] == 'lunas' ? 'Lunas' : 'Belum Lunas' ?>
@@ -118,9 +121,12 @@ $sys_message = getPaymentMessage();
                                                 Bayar Sisa
                                             </a>
                                         <?php endif; ?>
-
                                         <a href="form.php?edit=<?= $row['id'] ?>" class="text-blue-600 hover:text-blue-800 hover:underline text-xs inline-block">Kelola</a>
-                                        <a href="/simi-pbwd-2026/logic/payment_process.php?delete=<?= $row['id']; ?>" onclick="return confirm('Beneran nihh mau dihapus? Data tidak bisa dikembalikan!')" class="text-red-600 hover:text-red-800 hover:underline text-xs inline-block">Hapus</a>                            
+                                        <a href="../../logic/payment_process.php?delete=<?= $row['id']; ?>" 
+                                        onclick="return confirm('Apakah Anda yakin ingin menghapus semua riwayat pembayaran untuk iklan ini?')" 
+                                        class="text-red-600 hover:text-red-900">
+                                        Hapus
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endwhile; else: ?>
@@ -137,17 +143,14 @@ $sys_message = getPaymentMessage();
     </div>
 
     <script>
-    const alertBox = document.getElementById('notification-box');
-    if (alertBox) {
-        setTimeout(() => {
-            alertBox.style.opacity = '0';
-            alertBox.style.transform = 'translateY(-10px)';
-
+        const alertBox = document.getElementById('notification-box');
+        if (alertBox) {
             setTimeout(() => {
-                alertBox.remove();
-            }, 500);
-        }, 3000);
-    }
+                alertBox.style.opacity = '0';
+                alertBox.style.transform = 'translateY(-10px)';
+                setTimeout(() => alertBox.remove(), 500);
+            }, 3000);
+        }
     </script>
 </body>
 </html>

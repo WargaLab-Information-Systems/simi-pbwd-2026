@@ -49,19 +49,18 @@ if (!function_exists('getAllPayments')) {
         ];
     }
 
-    // membuat ID Invoice Otomatis
     function generateInvoiceId($conn, $editData = null) {
         if ($editData) {
-            return "#SIMI-" . str_pad($editData['id'], 3, '0', STR_PAD_LEFT);
+            return "#PAY-" . str_pad($editData['id'], 3, '0', STR_PAD_LEFT);
         }
         $row = mysqli_fetch_assoc(mysqli_query($conn, "SELECT MAX(id) AS last_id FROM payments"));
         $next_id = ($row['last_id'] ?? 0) + 1;
-        return "#SIMI-" . str_pad($next_id, 3, '0', STR_PAD_LEFT);
+        return "#PAY-" . str_pad($next_id, 3, '0', STR_PAD_LEFT);
     }
 
     function getPaymentMessage() {
         if (!isset($_GET['msg'])) return null;
-        
+
         $messages = [
             'insert_success' => ['text' => 'Data pembayaran berhasil ditambahkan!', 'type' => 'green'],
             'update_success' => ['text' => 'Data pembayaran berhasil diperbarui!', 'type' => 'blue'],
@@ -72,11 +71,10 @@ if (!function_exists('getAllPayments')) {
         return $messages[$_GET['msg']] ?? null;
     }
 }
-//yang baru
+
 function getTotalRevenue($conn) {
     $query = "SELECT SUM(amount) as total FROM payments WHERE payment_status = 'lunas'";
     $result = mysqli_query($conn, $query);
     $row = mysqli_fetch_assoc($result);
     return $row['total'] ?? 0;
 }
-?>

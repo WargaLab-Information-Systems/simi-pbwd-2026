@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . "/../helper/db_conn.php";
+require_once __DIR__ . '/../helper/db_conn.php';
 
 if (isset($_POST['action'])) {
     $action           = $_POST['action'];
@@ -17,7 +17,7 @@ if (isset($_POST['action'])) {
         $current_id = mysqli_real_escape_string($conn, $_POST['id']);
         $exclude_id_condition = " AND id != '$current_id'";
     }
-    
+
     $history_query = mysqli_query($conn, "SELECT SUM(amount) AS total_terbayar FROM payments WHERE advertisement_id = '$advertisement_id' $exclude_id_condition");
     $history_data = mysqli_fetch_assoc($history_query);
     $sudah_dibayar_sebelumnya = floatval($history_data['total_terbayar'] ?? 0);
@@ -35,10 +35,9 @@ if (isset($_POST['action'])) {
     // tambah
     if ($action == 'insert') {
         $query = "INSERT INTO payments (advertisement_id, amount, payment_date, payment_status, notes) 
-                  VALUES ('$advertisement_id', '$amount', '$payment_date', '$payment_status', '$notes')";
-        
+                VALUES ('$advertisement_id', '$amount', '$payment_date', '$payment_status', '$notes')";
         $status = mysqli_query($conn, $query) ? 'insert_success' : 'error';
-        
+
     // update
     } elseif ($action == 'update') {
         $id = mysqli_real_escape_string($conn, $_POST['id']);
@@ -48,22 +47,44 @@ if (isset($_POST['action'])) {
                     payment_date = '$payment_date', 
                     payment_status = '$payment_status', 
                     notes = '$notes' 
-                  WHERE id = '$id'";
-                  
+                WHERE id = '$id'";
         $status = mysqli_query($conn, $query) ? 'update_success' : 'error';
     }
 
     header("Location: ../pages/payments/index.php?msg=" . $status);
-    exit(); 
+    exit();
 }
 
 // hapus
 if (isset($_GET['delete'])) {
-    $id = mysqli_real_escape_string($conn, $_GET['delete']);
-    $query = "DELETE FROM payments WHERE id = '$id'";
-    
-    $status = mysqli_query($conn, $query) ? 'delete_success' : 'error';
-    
-    header("Location: ../pages/payments/index.php?msg=" . $status);
-    exit();
+    $id_payment = mysqli_real_escape_string($conn, $_GET['delete']);
+
+    $get_ad_query = mysqli_query($conn, "SELECT advertisement_id FROM payments WHERE id = '$id_payment'");
+    $payment_data = mysqli_fetch_assoc($get_ad_query);
+
+    if ($payment_data) {
+        $advertisement_id = $payment_data['advertisement_id'];
+
+        $query_delete_all = "DELETE FROM payments WHERE advertisement_id = '$advertisement_id'";
+        
+        if (mysqli_query($conn, $query_delete_all)) {
+            
+            if (!headers_sent()) {
+                header("Cache-Control: no-cache, must-revalidate"); 
+                header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); 
+                header("Location: ../pages/payments/index.php?msg=delete_success");
+                exit();
+            } else {
+                echo "<script>window.location.href='../pages/payments/index.php?msg=delete_success';</script>";
+                exit();
+            }
+            
+        } else {
+            header("Location: ../pages/payments/index.php?msg=error");
+            exit();
+        }
+    } else {
+        header("Location: ../pages/payments/index.php?msg=already_deleted");
+        exit();
+    }
 }
