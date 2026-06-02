@@ -1,16 +1,13 @@
 <?php
 session_start();
-// user dah login ?
 if (!isset($_SESSION['user_id'])) {
-    // paksa ke login klo belum
     header("Location: ../auth/login.php");
-    exit; 
+    exit;
 }
 
-if (!isset($_SESSION['user_id'])) { header("Location: ../auth/login.php"); exit; }
-require_once '../../helper/db_conn.php';
-require_once '../../helper/data/advertisement.php';
-require_once '../../helper/data/client.php';
+require_once __DIR__ . '/../../helper/db_conn.php';
+require_once __DIR__ . '/../../helper/data/advertisement.php';
+require_once __DIR__ . '/../../helper/data/client.php';
 
 $id = $_GET['id'] ?? '';
 $ad = !empty($id) ? getAdvertisementById($conn, $id) : null;
@@ -36,7 +33,6 @@ $hari_ini = date('Y-m-d');
                 <a href="../dashboard/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Dashboard</a>
                 <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium">Iklan</a>
                 <a href="../clients/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Klien</a>
-                <!-- ini buat payment -->
                 <a href="../payments/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Payment</a>
             </div>
         </div>
@@ -86,7 +82,6 @@ $hari_ini = date('Y-m-d');
                     </div>
                 </div>
 
-                <!-- status dan harga -->
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Status</label>
@@ -98,7 +93,7 @@ $hari_ini = date('Y-m-d');
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Nilai Kontrak (Rp)</label>
-                        <input type="text" id="adPriceDisplay" value="<?php echo $ad ? number_format($ad['price'], 0, '', '.') : ''; ?>" oninput="formatCurrency(this)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500" >
+                        <input type="text" id="adPriceDisplay" value="<?php echo $ad ? number_format($ad['price'], 0, '', '.') : ''; ?>" oninput="formatCurrency(this)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-emerald-500">
                         <input type="hidden" id="adPrice" name="price" value="<?php echo $ad ? $ad['price'] : ''; ?>">
                         <p id="price_error" class="text-xs text-red-500 mt-1 hidden"></p>
                     </div>
@@ -119,7 +114,6 @@ $hari_ini = date('Y-m-d');
             start.setDate(start.getDate() + 1);
             let nextDay = start.toISOString().split('T')[0];
             endDateInput.min = nextDay;
-            
             if (endDateInput.value && endDateInput.value <= this.value) {
                 endDateInput.value = '';
             }
@@ -139,11 +133,11 @@ $hari_ini = date('Y-m-d');
         const startDate = document.getElementById('startDate');
         const endDate = document.getElementById('endDate');
         const price = document.getElementById('adPrice');
-        
+
         ['client_error', 'title_error', 'start_error', 'end_error', 'price_error'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
         });
-        
+
         if (client.value === '') {
             document.getElementById('client_error').textContent = 'Klien wajib dipilih.';
             document.getElementById('client_error').classList.remove('hidden');
@@ -159,7 +153,6 @@ $hari_ini = date('Y-m-d');
             document.getElementById('start_error').classList.remove('hidden');
             isValid = false;
         }
-
         if (endDate.value === '') {
             document.getElementById('end_error').textContent = 'Tanggal selesai wajib diisi.';
             document.getElementById('end_error').classList.remove('hidden');
@@ -167,14 +160,12 @@ $hari_ini = date('Y-m-d');
         } else if (startDate.value !== '') {
             const startD = new Date(startDate.value);
             const endD = new Date(endDate.value);
-            
             if (endD <= startD) {
                 document.getElementById('end_error').textContent = 'Tanggal selesai harus setelah tanggal mulai (minimal beda 1 hari).';
                 document.getElementById('end_error').classList.remove('hidden');
                 isValid = false;
             }
         }
-
         if (price.value.trim() === '' || parseFloat(price.value) <= 0) {
             document.getElementById('price_error').textContent = 'Harga harus lebih dari 0.';
             document.getElementById('price_error').classList.remove('hidden');

@@ -2,8 +2,8 @@
 session_start();
 if (!isset($_SESSION['user_id'])) { header("Location: ../pages/auth/login.php"); exit; }
 
-require_once '../helper/db_conn.php';
-require_once '../helper/data/advertisement.php';
+require_once __DIR__ . '/../helper/db_conn.php';
+require_once __DIR__ . '/../helper/data/advertisement.php';
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
@@ -26,7 +26,10 @@ if ($action === 'insert') {
 } elseif ($action === 'delete') {
     if (!empty($_GET['id'])) {
         $result = deleteAdvertisement($conn, $_GET['id']);
-        if ($result) {
+        if ($result === 'blocked') {
+            header("Location: ../pages/advertisements/index.php?msg=delete_blocked");
+            exit;
+        } elseif ($result) {
             header("Location: ../pages/advertisements/index.php");
             exit;
         } else {
@@ -37,4 +40,3 @@ if ($action === 'insert') {
     header("Location: ../pages/advertisements/index.php");
     exit;
 }
-?>

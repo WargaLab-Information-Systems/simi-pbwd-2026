@@ -16,6 +16,14 @@ function getAdvertisementById($conn, $id) {
 
 function deleteAdvertisement($conn, $id) {
     $id = mysqli_real_escape_string($conn, $id);
+
+    // Cek apakah iklan masih punya data pembayaran
+    $cek = mysqli_query($conn, "SELECT COUNT(*) as total FROM payments WHERE advertisement_id = '$id'");
+    $row = mysqli_fetch_assoc($cek);
+    if (intval($row['total']) > 0) {
+        return 'blocked';
+    }
+
     $query = "DELETE FROM advertisements WHERE id = '$id'";
     return mysqli_query($conn, $query);
 }
@@ -54,4 +62,3 @@ function getAllAdvertisements($conn) {
     }
     return $data;
 }
-?>

@@ -1,20 +1,27 @@
 <?php
 session_start();
-// user dah login ?
 if (!isset($_SESSION['user_id'])) {
-    // paksa ke login klo belum
     header("Location: ../auth/login.php");
-    exit; 
+    exit;
 }
 
-if (!isset($_SESSION['user_id'])) { header("Location: ../auth/login.php"); exit; }
-require_once '../../helper/db_conn.php';
+require_once __DIR__ . '/../../helper/db_conn.php';
 
-$query = "SELECT a.*, c.name AS client_name 
-        FROM advertisements a 
-        LEFT JOIN clients c ON a.client_id = c.id 
-        ORDER BY a.id DESC";
+$query = "SELECT a.*, c.name AS client_name,
+          COUNT(p.id) as jumlah_bayar
+          FROM advertisements a 
+          LEFT JOIN clients c ON a.client_id = c.id
+          LEFT JOIN payments p ON a.id = p.advertisement_id
+          GROUP BY a.id
+          ORDER BY a.id DESC";
 $result = mysqli_query($conn, $query);
+
+$message = '';
+$messageType = '';
+if (isset($_GET['msg']) && $_GET['msg'] === 'delete_blocked') {
+    $message = "Iklan tidak bisa dihapus karena masih memiliki data pembayaran terkait. Hapus pembayaran terlebih dahulu.";
+    $messageType = "red";
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,7 +42,6 @@ $result = mysqli_query($conn, $query);
                 <a href="../dashboard/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Dashboard</a>
                 <a href="index.php" class="block px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl text-sm font-medium">Iklan</a>
                 <a href="../clients/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Klien</a>
-                <!-- ini buat payment -->
                 <a href="../payments/index.php" class="block px-4 py-2.5 text-slate-500 hover:bg-slate-50 rounded-xl text-sm font-medium">Payment</a>
             </div>
         </div>
@@ -53,50 +59,62 @@ $result = mysqli_query($conn, $query);
             </a>
         </div>
 
+        <?php if ($message): ?>
+            <div id="notification-box" class="mb-6 p-4 bg-<?= $messageType ?>-50 border border-<?= $messageType ?>-200 text-<?= $messageType ?>-800 rounded-xl font-medium">
+                <?= $message ?>
+            </div>
+        <?php endif; ?>
+
         <div class="bg-white border border-slate-100 rounded-2xl shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase track-wider">
-                            <th class="px-6 py-4">Klien</th>
-                            <th class="px-6 py-4">Judul Iklan</th>
-                            <th class="px-6 py-4">Masa Kontrak</th>
-                            <th class="px-6 py-4">Nilai Kontrak</th>
-                            <th class="px-6 py-4">Status</th>
-                            <th class="px-6 py-4 text-right">Aksi</th>
+                        <tr class="bg-slate-50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            <th class="px-6 py-4 whitespace-nowrap">Klien</th>
+                            <th class="px-6 py-4 min-w-[200px]">Judul Iklan</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Masa Kontrak</th>
+                            <th class="px-6 py-4 whitespace-nowrap">Nilai Kontrak</th>
+                            <th class="px-6 py-4 whitespace-nowrap text-center">Status</th>
+                            <th class="px-6 py-4 whitespace-nowrap text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 text-sm">
                         <?php if (mysqli_num_rows($result) > 0): ?>
                             <?php while ($row = mysqli_fetch_assoc($result)): ?>
                                 <tr class="hover:bg-slate-50/50 transition-colors">
-                                    <td class="px-6 py-4 font-medium text-slate-900">
+                                    <td class="px-6 py-4 font-medium text-slate-900 align-middle">
                                         <?php echo htmlspecialchars($row['client_name'] ?? 'Tidak Diketahui'); ?>
                                     </td>
-                                    <td class="px-6 py-4 text-slate-600">
+                                    <td class="px-6 py-4 text-slate-600 align-middle">
                                         <?php echo htmlspecialchars($row['title']); ?>
                                     </td>
-                                    <td class="px-6 py-4 text-slate-500 text-xs">
+                                    <td class="px-6 py-4 text-slate-500 text-xs whitespace-nowrap align-middle">
                                         <?php echo date('d M Y', strtotime($row['start_date'])); ?> - 
                                         <?php echo date('d M Y', strtotime($row['end_date'])); ?>
                                     </td>
-                                    <td class="px-6 py-4 text-slate-700 font-medium">
+                                    <td class="px-6 py-4 text-slate-700 font-medium whitespace-nowrap align-middle">
                                         Rp <?php echo number_format($row['price'], 0, ',', '.'); ?>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <?php 
+                                    <td class="px-6 py-4 whitespace-nowrap text-center align-middle">
+                                        <?php
+                                        // Perbaikan di bagian class span ini
                                         if ($row['status'] === 'aktif') {
-                                            echo '<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold">Aktif</span>';
+                                            echo '<span class="inline-block px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold whitespace-nowrap">Aktif</span>';
                                         } elseif ($row['status'] === 'belum_tayang') {
-                                            echo '<span class="px-2.5 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-semibold">Belum Tayang</span>';
+                                            echo '<span class="inline-block px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-semibold whitespace-nowrap">Belum Tayang</span>';
                                         } else {
-                                            echo '<span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold">Selesai</span>';
+                                            echo '<span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold whitespace-nowrap">Selesai</span>';
                                         }
                                         ?>
                                     </td>
-                                    <td class="px-6 py-4 text-right space-x-3">
-                                        <a href="form.php?id=<?php echo $row['id']; ?>" class="text-emerald-600 hover:text-emerald-900 font-medium">Edit</a>
-                                        <a href="../../logic/advertisement_process.php?action=delete&id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus data iklan ini?')" class="text-red-600 hover:text-red-900 font-medium">Hapus</a>
+                                    <td class="flex flex-col px-6 py-4 text-center whitespace-nowrap align-middle space-x-3">
+                                        <a href="detail.php?id=<?php echo $row['id']; ?>" class="inline-block text-yellow-600 hover:text-yellow-900 font-medium">Detail</a>
+                                        <a href="form.php?id=<?php echo $row['id']; ?>" class="inline-block text-emerald-600 hover:text-emerald-900 font-medium">Edit</a>
+                                        <?php if ($row['jumlah_bayar'] > 0): ?>
+                                            <span class="inline-block text-slate-300 font-medium cursor-not-allowed" title="Iklan masih memiliki <?= $row['jumlah_bayar'] ?> transaksi pembayaran">Hapus</span>
+                                        <?php else: ?>
+                                            <a href="../../logic/advertisement_process.php?action=delete&id=<?php echo $row['id']; ?>" onclick="return confirm('Yakin ingin menghapus data iklan ini?')" class="inline-block text-red-600 hover:text-red-900 font-medium">Hapus</a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -112,5 +130,15 @@ $result = mysqli_query($conn, $query);
             </div>
         </div>
     </div>
+    <script>
+    const alertBox = document.getElementById('notification-box');
+    if (alertBox) {
+        setTimeout(() => {
+            alertBox.style.opacity = '0';
+            alertBox.style.transition = 'opacity 0.5s';
+            setTimeout(() => alertBox.remove(), 500);
+        }, 4000);
+    }
+    </script>
 </body>
 </html>
