@@ -1,5 +1,11 @@
 <?php
+$host = "localhost";
+$user = "root";
+$pass = "260607";
+$db_name = "db_simi";
+$conn = mysqli_connect($host, $user, $pass, $db_name);
 
-$conn = mysqli_connect("localhost", "root", "", "db_simi");
-
+if (!$conn) {
+    die("Koneksi gagal: " . mysqli_connect_error());
+}
 ?>
